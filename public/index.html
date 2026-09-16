@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>名词表 decide 准度评测</title>
+    <style>
+      :root {
+        --bg: #f6f4ef;
+        --ink: #1a1a1a;
+        --muted: #5c5c5c;
+        --line: #d9d4c8;
+        --accent: #0b5fff;
+        --card: #fffef9;
+        --ok: #0a7a3e;
+        --bad: #a11;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        line-height: 1.45;
+      }
+      main {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 28px 20px 64px;
+      }
+      h1 {
+        font-size: 1.6rem;
+        font-weight: 650;
+        margin: 0 0 6px;
+      }
+      .sub {
+        color: var(--muted);
+        margin-bottom: 22px;
+      }
+      section {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 16px 18px;
+        margin-bottom: 14px;
+      }
+      h2 {
+        font-size: 0.95rem;
+        margin: 0 0 10px;
+        font-weight: 650;
+      }
+      label {
+        display: block;
+        font-size: 0.85rem;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      textarea,
+      input[type='text'],
+      input[type='number'] {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font: inherit;
+        background: #fff;
+      }
+      textarea {
+        min-height: 140px;
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 12px;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        margin-top: 10px;
+      }
+      button {
+        border: 1px solid var(--ink);
+        background: var(--ink);
+        color: #fff;
+        border-radius: 8px;
+        padding: 9px 14px;
+        font: inherit;
+        cursor: pointer;
+      }
+      button.secondary {
+        background: transparent;
+        color: var(--ink);
+      }
+      button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      .pill {
+        display: inline-block;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 3px 10px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .pill.ok {
+        color: var(--ok);
+        border-color: #b7e0c5;
+      }
+      .pill.bad {
+        color: var(--bad);
+        border-color: #ecc;
+      }
+      #log {
+        white-space: pre-wrap;
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 12px;
+        background: #111;
+        color: #d7e0d0;
+        border-radius: 8px;
+        padding: 12px;
+        min-height: 120px;
+        max-height: 360px;
+        overflow: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      th,
+      td {
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        padding: 8px 6px;
+        vertical-align: top;
+      }
+      th {
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .check {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>名词表 · decide 准度</h1>
+      <p class="sub">
+        本仓默认策略：建 S → 勾 S_q → 定位 → 拓扑袋 → decide 过闸。不跑 toc_nav。主仓代码不受影响。
+      </p>
+
+      <section>
+        <h2>状态</h2>
+        <div class="row" id="statusRow">
+          <span class="pill" id="healthPill">检查中…</span>
+        </div>
+      </section>
+
+      <section>
+        <h2>1. 导入语料包</h2>
+        <label>选择主仓导出的 *.docuverse.json</label>
+        <input type="file" id="corpusFile" accept=".json,.docuverse.json,application/json" />
+        <div class="row">
+          <button id="btnUpload" type="button">上传语料</button>
+          <span class="pill" id="corpusPill">未导入</span>
+        </div>
+      </section>
+
+      <section>
+        <h2>2. 评测题（gold）</h2>
+        <label>JSON：{ "cases": [{ "id", "question", "goldPages": [], "goldMode": "any" }] }</label>
+        <textarea id="evalJson"></textarea>
+        <div class="row">
+          <button class="secondary" id="btnSaveCases" type="button">保存题目</button>
+          <button class="secondary" id="btnLoadSample" type="button">载入示例</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>3. 抽全名词（S₀ + 缺口 → U）/ 评测</h2>
+        <p class="sub" style="margin-top: 0">
+          <b>U</b> = S₀∪S₁。规则 S₀ 不验。主验证：<b>LLM 补的缺口词能否在残文命中</b>
+          （分批约 2500 字 + mask(S₀) 全书残文）；未命中拒收，不进 U。
+        </p>
+        <div class="check">
+          <input type="checkbox" id="residualLlm" checked />
+          <label for="residualLlm" style="margin: 0"
+            >开残文 LLM 补缺口（建议开；全书分批，可能较久）</label
+          >
+        </div>
+        <div class="row">
+          <button id="btnSuperviseS" type="button">抽全并监督闭合</button>
+          <button class="secondary" id="btnDlSuperviseMd" type="button">
+            下载监督 Markdown
+          </button>
+          <button class="secondary" id="btnDlSuperviseJson" type="button">
+            下载监督 JSON
+          </button>
+          <button class="secondary" id="btnDlU" type="button">
+            下载名词全集 U
+          </button>
+        </div>
+        <div class="row" style="margin-top: 8px">
+          <button class="secondary" id="btnBuildS" type="button">只建 S₀（过滤版·旧）</button>
+          <button id="btnRun" type="button">跑名词表评测</button>
+        </div>
+        <div id="superviseBox" class="sub" style="margin-top: 10px"></div>
+      </section>
+
+      <section>
+        <h2>日志</h2>
+        <div id="log"></div>
+      </section>
+
+      <section>
+        <h2>结果 / 监控导出</h2>
+        <div class="row">
+          <button class="secondary" id="btnDlMonitorJson" type="button">
+            下载监控包 JSON
+          </button>
+          <button class="secondary" id="btnDlMonitorMd" type="button">
+            下载监控包 Markdown
+          </button>
+        </div>
+        <div id="diagnosis" class="sub" style="margin-top: 10px"></div>
+        <div id="agg" class="sub">尚未运行</div>
+        <div style="overflow-x: auto">
+          <table>
+            <thead>
+              <tr>
+                <th>id</th>
+                <th>计分</th>
+                <th>hit</th>
+                <th>pred pages</th>
+                <th>suggested gold</th>
+                <th>S_q</th>
+                <th>诊断</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    <script>
+      const logEl = document.getElementById('log')
+      function log(msg) {
+        logEl.textContent += msg + '\n'
+        logEl.scrollTop = logEl.scrollHeight
+      }
+      function clearLog() {
+        logEl.textContent = ''
+      }
+
+      const sample = {
+        cases: [
+          {
+            id: 'q-lacan',
+            question: '是否提到拉康？',
+            goldPages: [],
+            goldMode: 'any',
+          },
+          {
+            id: 'q-freud',
+            question: '如何批判弗洛伊德？',
+            goldPages: [],
+            goldMode: 'any',
+          },
+        ],
+      }
+      document.getElementById('evalJson').value = JSON.stringify(sample, null, 2)
+
+      async function refreshHealth() {
+        const r = await fetch('/api/health')
+        const j = await r.json()
+        const pill = document.getElementById('healthPill')
+        pill.textContent =
+          'strategy=' +
+          j.strategy +
+          ' · LLM=' +
+          (j.llmConfigured ? j.model : '缺 KEY') +
+          (j.hasCorpus
+            ? ' · ' + j.corpus.label + ' · chunks=' + j.corpus.chunks
+            : ' · 无语料')
+        pill.className = 'pill ' + (j.llmConfigured ? 'ok' : 'bad')
+        if (j.hasCorpus) {
+          document.getElementById('corpusPill').textContent =
+            j.corpus.label + ' · ' + j.corpus.chunks + ' chunks'
+          document.getElementById('corpusPill').className = 'pill ok'
+        }
+      }
+
+      document.getElementById('btnUpload').onclick = async () => {
+        const f = document.getElementById('corpusFile').files?.[0]
+        if (!f) {
+          alert('请选择语料文件')
+          return
+        }
+        clearLog()
+        log('读取 ' + f.name + ' …')
+        const text = await f.text()
+        let raw
+        try {
+          raw = JSON.parse(text)
+        } catch (e) {
+          log('JSON 失败: ' + e)
+          return
+        }
+        const r = await fetch('/api/corpus', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(raw),
+        })
+        const j = await r.json()
+        if (!j.ok) {
+          log('导入失败: ' + j.error)
+          return
+        }
+        log('已导入: ' + j.label + ' · docId=' + j.docId + ' · chunks=' + j.chunks)
+        refreshHealth()
+      }
+
+      document.getElementById('btnSaveCases').onclick = async () => {
+        let raw
+        try {
+          raw = JSON.parse(document.getElementById('evalJson').value)
+        } catch (e) {
+          alert('题目 JSON 无效')
+          return
+        }
+        const r = await fetch('/api/eval-cases', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(raw),
+        })
+        const j = await r.json()
+        log(j.ok ? '已保存题目 ×' + j.n : '失败: ' + j.error)
+      }
+
+      document.getElementById('btnLoadSample').onclick = () => {
+        document.getElementById('evalJson').value = JSON.stringify(sample, null, 2)
+      }
+
+      document.getElementById('btnBuildS').onclick = async () => {
+        clearLog()
+        log('建名词表 S₀…')
+        const residualLlm = document.getElementById('residualLlm').checked
+        const r = await fetch('/api/build-s', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ residualLlm }),
+        })
+        const j = await r.json()
+        if (!j.ok) {
+          log('失败: ' + j.error)
+          return
+        }
+        log(j.note)
+        log('sample: ' + j.sample.map((x) => x.surface + '(' + x.df + ')').join(', '))
+      }
+
+      document.getElementById('btnSuperviseS').onclick = async () => {
+        clearLog()
+        const residualLlm = document.getElementById('residualLlm').checked
+        log(
+          residualLlm
+            ? '抽全：S₀ + 全书残文分批 LLM…（可能很久）'
+            : '抽全：仅规则 S₀ + 残文规则再扫（无 LLM）…',
+        )
+        const r = await fetch('/api/supervise-s', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ residualLlm }),
+        })
+        const j = await r.json()
+        if (!j.ok) {
+          log('失败: ' + j.error)
+          return
+        }
+        const rep = j.report
+        const box = document.getElementById('superviseBox')
+        const hv = rep.llmHitVerify || {}
+        box.innerHTML =
+          '<b>' +
+          rep.verdict +
+          '</b><br/><b>U</b> = ' +
+          (rep.uMeaning || 'S0∪S1') +
+          '<br/>LLM缺口命中质检 ok=' +
+          (hv.ok ?? rep.closure.closed) +
+          ' · 提出×' +
+          (hv.proposed ?? '?') +
+          ' · 命中×' +
+          (hv.hit ?? '?') +
+          ' · 拒收×' +
+          (hv.missCount ?? '?') +
+          ' · hitRate=' +
+          (hv.hitRate != null ? (hv.hitRate * 100).toFixed(1) + '%' : '?') +
+          '<br/>' +
+          (rep.closure.note || '')
+        log(rep.verdict)
+        log('U: ' + (rep.uMeaning || ''))
+        for (const n of rep.notes || []) log('  ' + n)
+        if (hv.miss?.length) {
+          log('残文未命中拒收: ' + hv.miss.slice(0, 20).join(' · '))
+        }
+        log('已写入 results/supervise-s-*.md · 可下载 U')
+      }
+
+      async function downloadSupervise(format) {
+        const r = await fetch('/api/supervise-s?format=' + format)
+        if (!r.ok) {
+          const j = await r.json().catch(() => ({}))
+          alert(j.error || '请先跑抽全监督')
+          return
+        }
+        const blob = await r.blob()
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob)
+        a.download =
+          format === 'md'
+            ? 'complete-nouns-supervise.md'
+            : format === 'u'
+              ? 'noun-universe-U.json'
+              : 'complete-nouns-supervise.json'
+        a.click()
+        URL.revokeObjectURL(a.href)
+      }
+      document.getElementById('btnDlSuperviseMd').onclick = () =>
+        downloadSupervise('md')
+      document.getElementById('btnDlSuperviseJson').onclick = () =>
+        downloadSupervise('json')
+      document.getElementById('btnDlU').onclick = () => downloadSupervise('u')
+
+      document.getElementById('btnRun').onclick = async () => {
+        clearLog()
+        let casesPayload
+        try {
+          casesPayload = JSON.parse(document.getElementById('evalJson').value)
+        } catch (e) {
+          alert('题目 JSON 无效')
+          return
+        }
+        await fetch('/api/eval-cases', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(casesPayload),
+        })
+        log('开始名词表评测…（可能较久，看网络与批次数）')
+        const residualLlm = document.getElementById('residualLlm').checked
+        const r = await fetch('/api/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ residualLlm, cases: casesPayload.cases }),
+        })
+        const j = await r.json()
+        if (!j.aggregate) {
+          log('失败: ' + (j.error || JSON.stringify(j)))
+          return
+        }
+        const a = j.aggregate
+        document.getElementById('agg').textContent =
+          'scored=' +
+          (a.scoredN ?? 0) +
+          '/' +
+          a.n +
+          (a.hitRate == null
+            ? ' · hitRate=N/A（请先填 gold）'
+            : ' · hitRate=' + (a.hitRate * 100).toFixed(1) + '%') +
+          (a.meanPrecision == null
+            ? ''
+            : ' · meanP=' +
+              a.meanPrecision.toFixed(3) +
+              ' · meanR=' +
+              a.meanRecall.toFixed(3))
+        const diag = document.getElementById('diagnosis')
+        diag.innerHTML = (j.diagnosis || [])
+          .map((d) => '<div>· ' + d + '</div>')
+          .join('')
+        const tb = document.getElementById('tbody')
+        tb.innerHTML = ''
+        const monCases = j.monitor?.cases || []
+        for (let i = 0; i < j.cases.length; i++) {
+          const row = j.cases[i]
+          const mon = monCases[i]
+          const s = row.score
+          const res = row.result
+          const tr = document.createElement('tr')
+          tr.innerHTML =
+            '<td>' +
+            s.id +
+            '</td><td>' +
+            (s.scored ? 'Y' : 'N') +
+            '</td><td>' +
+            (s.scored ? (s.hit ? 'Y' : 'N') : '—') +
+            '</td><td>' +
+            (res.predictedPages || []).join(',') +
+            '</td><td>' +
+            ((mon && mon.suggestedGoldPages) || []).slice(0, 12).join(',') +
+            '</td><td>' +
+            (res.sq || []).slice(0, 8).join(' · ') +
+            '</td><td>' +
+            ((mon && mon.diagnosis) || []).slice(0, 2).join('；') +
+            '</td>'
+          tb.appendChild(tr)
+          log(
+            s.id +
+              ' ' +
+              s.scoreNote +
+              ' pages=[' +
+              (res.predictedPages || []).join(',') +
+              '] · ' +
+              res.note,
+          )
+        }
+        log('完成。监控包已写入 results/monitor-*.json|md')
+        log('可点「下载监控包」或把 md 贴回对话优化')
+      }
+
+      async function downloadMonitor(format) {
+        const r = await fetch('/api/monitor?format=' + format)
+        if (!r.ok) {
+          const j = await r.json().catch(() => ({}))
+          alert(j.error || '下载失败：请先跑评测')
+          return
+        }
+        const blob = await r.blob()
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob)
+        a.download =
+          format === 'md' ? 'noun-table-monitor.md' : 'noun-table-monitor.json'
+        a.click()
+        URL.revokeObjectURL(a.href)
+      }
+      document.getElementById('btnDlMonitorJson').onclick = () =>
+        downloadMonitor('json')
+      document.getElementById('btnDlMonitorMd').onclick = () =>
+        downloadMonitor('md')
+
+      refreshHealth().catch((e) => log(String(e)))
+    </script>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "docId": "replace-with-corpus-docId",
+  "cases": [
+    {
+      "id": "q-lacan-mention",
+      "question": "是否提到拉康？",
+      "goldPages": [12, 13],
+      "goldMode": "any"
+    },
+    {
+      "id": "q-critique-freud",
+      "question": "如何批判弗洛伊德？",
+      "goldBookKeys": [],
+      "goldPages": [40, 41, 42],
+      "goldMode": "any"
+    }
+  ]
+}

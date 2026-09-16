@@ -1,0 +1,248 @@
+{
+  "meta": {
+    "llmProvider": "openai",
+    "model": "deepseek-chat",
+    "validationSamples": 20,
+    "consistentCount": 16,
+    "accuracyRate": 80,
+    "totalS1Nouns": 7,
+    "totalDirectNouns": 3,
+    "totalMatched": 3
+  },
+  "comparisons": [
+    {
+      "truncId": 1551,
+      "text": "s plutôt que",
+      "s1Nouns": [],
+      "directNouns": [],
+      "matched": [],
+      "s1Only": [],
+      "directOnly": [],
+      "isConsistent": true
+    },
+    {
+      "truncId": 1633,
+      "text": ", plutôt que",
+      "s1Nouns": [],
+      "directNouns": [],
+      "matched": [],
+      "s1Only": [],
+      "directOnly": [],
+      "isConsistent": true
+    },
+    {
+      "truncId": 4277,
+      "text": "ouer homophonique",
+      "s1Nouns": [
+        "homophonique"
+      ],
+      "directNouns": [],
+      "matched": [],
+      "s1Only": [
+        "homophonique"
+      ],
+      "directOnly": [],
+      "isConsistent": false
+    },
+    {
+      "truncId": 5085,
+      "text": "optique sur",
+      "s1Nouns": [
+        "optique"
+      ],
+      "directNouns": [
+        "optique"
+      ],
+      "matched": [
+        "optique"
+      ],
+      "s1Only": [],
+      "directOnly": [],
+      "isConsistent": true
+    },
+    {
+      "truncId": 7954,
+      "text": "parvenir à pen",
+      "s1Nouns": [],
+      "directNouns": [],
+      "matched": [],
+      "s1Only": [],
+      "directOnly": [],
+      "isConsistent": true
+    },
+    {
+      "truncId": 8266,
+      "text": "qui ont cherché à appréh",
+      "s1Nouns": [],
+      "directNouns": [],
+      "matched": [],
+      "s1Only": [],
+      "directOnly": [],
+      "isConsistent": true
+    },
+    {
+      "truncId": 8919,
+      "text": "renoncent à",
+      "s1Nouns": [],
+      "directNouns": [],
+      "matched": [],
+      "s1Only": [],
+      "directOnly": [],
+      "isConsistent": true
+    },
+    {
+      "truncId": 9063,
+      "text": ", - impliqu",
+      "s1Nouns": [],
+      "directNouns": [],
+      "matched": [],
+      "s1Only": [],
+      "directOnly": [],
+      "isConsistent": true
+    },
+    {
+      "truncId": 9471,
+      "text": "évoqués pl",
+      "s1Nouns": [],
+      "directNouns": [],
+      "matched": [],
+      "s1Only": [],
+      "directOnly": [],
+      "isConsistent": true
+    },
+    {
+      "truncId": 10150,
+      "text": "nt, enquel",
+      "s1Nouns": [],
+      "directNouns": [],
+      "matched": [],
+      "s1Only": [],
+      "directOnly": [],
+      "isConsistent": true
+    },
+    {
+      "truncId": 12087,
+      "text": "SCRIPT pré",
+      "s1Nouns": [
+        "script"
+      ],
+      "directNouns": [
+        "SCRIPT"
+      ],
+      "matched": [
+        "script"
+      ],
+      "s1Only": [],
+      "directOnly": [],
+      "isConsistent": true
+    },
+    {
+      "truncId": 14092,
+      "text": "créatrice et s",
+      "s1Nouns": [
+        "créatrice"
+      ],
+      "directNouns": [],
+      "matched": [],
+      "s1Only": [
+        "créatrice"
+      ],
+      "directOnly": [],
+      "isConsistent": false
+    },
+    {
+      "truncId": 14317,
+      "text": "-médiatique",
+      "s1Nouns": [
+        "médiatique"
+      ],
+      "directNouns": [],
+      "matched": [],
+      "s1Only": [
+        "médiatique"
+      ],
+      "directOnly": [],
+      "isConsistent": false
+    },
+    {
+      "truncId": 16108,
+      "text": "iaux, qualifiés par",
+      "s1Nouns": [
+        "iaux"
+      ],
+      "directNouns": [],
+      "matched": [],
+      "s1Only": [
+        "iaux"
+      ],
+      "directOnly": [],
+      "isConsistent": false
+    },
+    {
+      "truncId": 16665,
+      "text": "érigée, en",
+      "s1Nouns": [],
+      "directNouns": [],
+      "matched": [],
+      "s1Only": [],
+      "directOnly": [],
+      "isConsistent": true
+    },
+    {
+      "truncId": 23376,
+      "text": ", Patrie*.\n1.",
+      "s1Nouns": [
+        "patrie"
+      ],
+      "directNouns": [
+        "Patrie"
+      ],
+      "matched": [
+        "patrie"
+      ],
+      "s1Only": [],
+      "directOnly": [],
+      "isConsistent": true
+    },
+    {
+      "truncId": 24272,
+      "text": "duient aux",
+      "s1Nouns": [],
+      "directNouns": [],
+      "matched": [],
+      "s1Only": [],
+      "directOnly": [],
+      "isConsistent": true
+    },
+    {
+      "truncId": 24354,
+      "text": "nt répertoriés d",
+      "s1Nouns": [],
+      "directNouns": [],
+      "matched": [],
+      "s1Only": [],
+      "directOnly": [],
+      "isConsistent": true
+    },
+    {
+      "truncId": 24651,
+      "text": "duiront au",
+      "s1Nouns": [],
+      "directNouns": [],
+      "matched": [],
+      "s1Only": [],
+      "directOnly": [],
+      "isConsistent": true
+    },
+    {
+      "truncId": 26151,
+      "text": "et scriptu",
+      "s1Nouns": [],
+      "directNouns": [],
+      "matched": [],
+      "s1Only": [],
+      "directOnly": [],
+      "isConsistent": true
+    }
+  ]
+}

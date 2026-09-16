@@ -1,0 +1,107 @@
+{
+  "meta": {
+    "source": "s1 LLM兜底补缺",
+    "llmProvider": "openai",
+    "model": "deepseek-chat",
+    "concurrency": 5,
+    "batchSize": 4,
+    "inputTruncations": 40,
+    "totalMissedNounSamples": 40,
+    "outputNouns": 6,
+    "totalOffsets": 6,
+    "elapsedSeconds": 2,
+    "s0IntervalCount": 59431,
+    "confidenceStats": {
+      "high": 6,
+      "medium": 0,
+      "low": 0
+    },
+    "deduplicationInfo": "已过滤与 s0 重叠的位置（基于 59431 个s0命中区间）"
+  },
+  "nouns": [
+    {
+      "id": "aborigèn",
+      "surface": "aborigèn",
+      "offsets": [
+        {
+          "start": 35914,
+          "end": 35922,
+          "confidence": "high"
+        }
+      ],
+      "sourceTruncIds": [
+        35912
+      ]
+    },
+    {
+      "id": "créatrice",
+      "surface": "créatrice",
+      "offsets": [
+        {
+          "start": 14063,
+          "end": 14072,
+          "confidence": "high"
+        }
+      ],
+      "sourceTruncIds": [
+        14062
+      ]
+    },
+    {
+      "id": "médiaque",
+      "surface": "médiaque",
+      "offsets": [
+        {
+          "start": 30239,
+          "end": 30247,
+          "confidence": "high"
+        }
+      ],
+      "sourceTruncIds": [
+        30238
+      ]
+    },
+    {
+      "id": "patrie",
+      "surface": "Patrie",
+      "offsets": [
+        {
+          "start": 23348,
+          "end": 23354,
+          "confidence": "high"
+        }
+      ],
+      "sourceTruncIds": [
+        23346
+      ]
+    },
+    {
+      "id": "robotique",
+      "surface": "robotique",
+      "offsets": [
+        {
+          "start": 30976,
+          "end": 30985,
+          "confidence": "high"
+        }
+      ],
+      "sourceTruncIds": [
+        30974
+      ]
+    },
+    {
+      "id": "script",
+      "surface": "SCRIPT",
+      "offsets": [
+        {
+          "start": 12057,
+          "end": 12063,
+          "confidence": "high"
+        }
+      ],
+      "sourceTruncIds": [
+        12057
+      ]
+    }
+  ]
+}

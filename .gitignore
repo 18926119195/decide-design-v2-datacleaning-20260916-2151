@@ -1,0 +1,52 @@
+# ---------- 依赖 / 构建产物 ----------
+node_modules/
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# ---------- 运行时配置 / 密钥 ----------
+.env
+.env.local
+.env.*.local
+# 仅保留 .env.example 给协作者参考
+!.env.example
+
+# ---------- 评测产物 ----------
+results/*.json
+results/*.md
+!results/.gitkeep
+
+# ---------- 大体积中间产物（保留最终 final-noun-index.json 即可） ----------
+extract_test_result.json
+final-noun-table.json
+final-noun-index.before-latex-fix.json
+s0-hits.json
+merge-review-result.json
+debug-run*.log
+
+# ---------- 语料（体积大、本地私用） ----------
+fixtures/last-corpus.docuverse.json
+corpus/
+
+# ---------- 运行时产物（本地私用） ----------
+output/
+
+# ---------- 编辑器 / 系统 ----------
+.vscode/
+.idea/
+.cursor/
+.DS_Store
+Thumbs.db
+
+# ---------- 日志 ----------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ---------- 系统元数据（如有 cursor projects） ----------
+.cursor-project
+
+# ---------- gh 临时凭证（少见，但保持干净） ----------
+.gh-token
